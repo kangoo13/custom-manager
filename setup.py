@@ -7,7 +7,7 @@ setup(
   author = 'Aurelien Schiltz',
   author_email = 'aurelien.schiltz@epitech.eu',
   url = 'https://github.com/kangoo13/custom-manager', # use the URL to the github repo
-  download_url = 'https://github.com/kangoo13/custom-manager/tarball/0.1', # I'll explain this in a second
+  download_url = 'https://github.com/kangoo13/custom-manager/tarball/0.2', # I'll explain this in a second
   keywords = ['scrapy', 'proxies', 'proxy'], # arbitrary keywords
   classifiers = [],
 )

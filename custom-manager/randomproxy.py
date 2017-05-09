@@ -18,12 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import re
-import random
-import sys
 import base64
-import json
 import logging
+import random
+import re
+
 import requests
 
 log = logging.getLogger('scrapy.proxies')
@@ -31,6 +30,7 @@ log = logging.getLogger('scrapy.proxies')
 
 class Mode:
     RANDOMIZE_PROXY_EVERY_REQUESTS, RANDOMIZE_PROXY_ONCE, SET_CUSTOM_PROXY = range(3)
+
 
 class RandomProxy(object):
     def __init__(self, settings):
@@ -87,11 +87,6 @@ class RandomProxy(object):
         return cls(crawler.settings)
 
     def process_request(self, request, spider):
-        # Don't overwrite with a random one (server-side state for IP)
-        if 'proxy' in request.meta:
-            if request.meta["exception"] is False:
-                return
-        request.meta["exception"] = False
         if len(self.proxies) == 0:
             raise ValueError('All proxies are unusable, cannot proceed')
 
@@ -109,20 +104,26 @@ class RandomProxy(object):
         else:
             log.debug('Proxy user pass not found')
         log.debug('Using proxy <%s>, %d proxies left' % (
-                proxy_address, len(self.proxies)))
+            proxy_address, len(self.proxies)))
 
     def process_exception(self, request, exception, spider):
         if 'proxy' not in request.meta:
             return
-        print ("exception")
+        print("exception : " + str(exception))
         if self.mode == Mode.RANDOMIZE_PROXY_EVERY_REQUESTS or self.mode == Mode.RANDOMIZE_PROXY_ONCE:
             proxy = request.meta['proxy']
             try:
                 del self.proxies[proxy]
             except KeyError:
                 pass
-            request.meta["exception"] = True
-            if self.mode == Mode.RANDOMIZE_PROXY_ONCE:
-                self.chosen_proxy = random.choice(list(self.proxies.keys()))
             log.info('Removing failed proxy <%s>, %d proxies left' % (
                 proxy, len(self.proxies)))
+            if self.mode == Mode.RANDOMIZE_PROXY_ONCE:
+                self.chosen_proxy = random.choice(list(self.proxies.keys()))
+                proxy_address = self.chosen_proxy
+            else:
+                proxy_address = random.choice(list(self.proxies.keys()))
+            request.meta['proxy'] = proxy_address
+            basic_auth = 'Basic ' + base64.b64encode(self.proxies[proxy_address].encode()).decode()
+            request.headers['Proxy-Authorization'] = basic_auth
+            return request

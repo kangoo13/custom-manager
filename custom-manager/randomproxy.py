@@ -46,7 +46,7 @@ class RandomProxy(object):
                 proxies = r.text.split('\n')
                 proxies = proxies[-11:]
                 for proxy in proxies:
-                    parts = re.search('([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:80):([a-zA-Z0-9]+:[a-zA-Z0-9]+)$', proxy.strip())
+                    parts = re.search('([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]*):([a-zA-Z0-9]+:[a-zA-Z0-9]+)$', proxy.strip())
                     if not parts:
                         continue
                     self.proxies["http://" + parts.group(1)] = parts.group(2)

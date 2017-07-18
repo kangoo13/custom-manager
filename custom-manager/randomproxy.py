@@ -44,7 +44,6 @@ class RandomProxy(object):
             if "buyproxies" in self.proxy_list:
                 r = requests.get(self.proxy_list)
                 proxies = r.text.split('\n')
-                proxies = proxies[-11:]
                 for proxy in proxies:
                     parts = re.search('([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]*):([a-zA-Z0-9]+:[a-zA-Z0-9]+)$', proxy.strip())
                     if not parts:
